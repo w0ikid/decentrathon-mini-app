@@ -47,7 +47,7 @@ func sendTelegramMessage(chatID int64, text string) {
                     {
                         "text": "Open LMS",
                         "web_app": map[string]string{
-                            "url": "https://your-domain.com", // URL вашего приложения
+                            "url": "https://decentrathon-mini-app.vercel.app/", // URL вашего приложения
                         },
                     },
                 },
