@@ -69,6 +69,38 @@ func sendTelegramMessage(chatID int64, text string) {
     log.Println("Message sent to chat", chatID)
 }
 
+func sendWebApp(chatID int64) {
+    url := "https://api.telegram.org/bot" + botToken + "/sendMessage"
+
+    // Сообщение с кнопкой для открытия Web App
+    message := map[string]interface{}{
+        "chat_id": chatID,
+        "text":    "Нажмите на кнопку ниже, чтобы открыть Web App:",
+        "reply_markup": map[string]interface{}{
+            "inline_keyboard": [][]map[string]interface{}{
+                {
+                    {
+                        "text": "Открыть Web App",
+                        "web_app": map[string]string{
+                            "url": "https://decentrathon-mini-app.vercel.app/", // Ваш Web App URL
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+    jsonData, _ := json.Marshal(message)
+    resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+    if err != nil {
+        log.Println("Ошибка при отправке сообщения:", err)
+        return
+    }
+    defer resp.Body.Close()
+    log.Println("Сообщение успешно отправлено.")
+}
+
+
 // Обработчик Webhook для получения сообщений от Telegram
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
     log.Println("Webhook handler triggered") // Логирует начало работы обработчика
