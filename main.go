@@ -29,34 +29,46 @@ type TelegramUpdate struct {
     } `json:"message"`
 }
 
-// Структура для курсов
-type Course struct {
-    ID          int    `json:"id"`
-    Title       string `json:"title"`
-    Description string `json:"description"`
-}
-
-// Пример курсов
-var courses = []Course{
-    {ID: 1, Title: "Go Basics", Description: "Learn the basics of Go programming"},
-    {ID: 2, Title: "Advanced JavaScript", Description: "Deep dive into JavaScript"},
-}
-
-// Функция для отправки сообщения пользователю с кнопкой для открытия Web App
+// Функция для отправки простого текстового сообщения
 func sendTelegramMessage(chatID int64, text string) {
     url := "https://api.telegram.org/bot" + botToken + "/sendMessage"
-
-    // Формируем сообщение с кнопкой для запуска Web App
     message := map[string]interface{}{
         "chat_id": chatID,
         "text":    text,
+    }
+    jsonData, _ := json.Marshal(message)
+    resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+    if err != nil {
+        log.Println("Failed to send message:", err)
+        return
+    }
+    defer resp.Body.Close()
+
+    body, _ := ioutil.ReadAll(resp.Body)
+
+    if resp.StatusCode != http.StatusOK {
+        log.Printf("Telegram API returned non-200 status: %d, response: %s", resp.StatusCode, string(body))
+        return
+    }
+
+    log.Printf("Message sent to chat %d", chatID)
+}
+
+// Функция для отправки инлайн-кнопки для открытия Web App
+func sendWebAppButton(chatID int64) {
+    url := "https://api.telegram.org/bot" + botToken + "/sendMessage"
+
+    // Формируем сообщение с инлайн-кнопкой для запуска Web App
+    message := map[string]interface{}{
+        "chat_id": chatID,
+        "text":    "Нажмите на кнопку ниже, чтобы открыть Web App:",
         "reply_markup": map[string]interface{}{
             "inline_keyboard": [][]map[string]interface{}{
                 {
                     {
-                        "text": "Open LMS",
+                        "text": "Открыть Web App",
                         "web_app": map[string]string{
-                            "url": "https://decentrathon-mini-app.vercel.app/", // URL вашего приложения
+                            "url": "https://ae08-128-127-102-7.ngrok-free.app", // URL вашего приложения
                         },
                     },
                 },
@@ -70,81 +82,60 @@ func sendTelegramMessage(chatID int64, text string) {
     // Отправляем POST-запрос в API Telegram
     resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
     if err != nil {
-        log.Println("Failed to send message:", err)
+        log.Println("Failed to send Web App button:", err)
         return
     }
     defer resp.Body.Close()
 
+    // Читаем и выводим ответ от Telegram API для отладки
+    body, _ := ioutil.ReadAll(resp.Body)
+
     if resp.StatusCode != http.StatusOK {
-        log.Printf("Telegram API returned non-200 status: %d", resp.StatusCode)
+        log.Printf("Telegram API returned non-200 status: %d, response: %s", resp.StatusCode, string(body))
         return
     }
 
-    log.Printf("Message sent to chat %d", chatID)
+    log.Printf("Web App button sent to chat %d", chatID)
 }
 
-// Обработчик Webhook для получения сообщений от Telegram
+// Обработчик для вебхука Telegram
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
-    log.Println("Webhook handler triggered")
-
     var update TelegramUpdate
 
-    // Читаем тело запроса для отладки
-    body, err := ioutil.ReadAll(r.Body)
-    if err != nil {
-        log.Printf("Error reading request body: %v", err)
-        http.Error(w, "Cannot read body", http.StatusBadRequest)
-        return
-    }
-    log.Printf("Received request body: %s", string(body))
-
     // Декодируем JSON от Telegram
-    if err := json.Unmarshal(body, &update); err != nil {
+    if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
         log.Printf("Error decoding update: %v", err)
         http.Error(w, "Bad request", http.StatusBadRequest)
         return
     }
 
-    // Логируем полученное сообщение
-    log.Printf("Received message from chat %d: %s", update.Message.Chat.ID, update.Message.Text)
+    chatID := update.Message.Chat.ID
+    messageText := update.Message.Text
+
+    // Если пользователь отправил команду /helloworld, отправляем "Hello, World!"
+    if messageText == "/helloworld" {
+        sendTelegramMessage(chatID, "Hello, World!")
+    } else if messageText == "/webapp" {
+        // Если команда /webapp, отправляем кнопку для открытия Web App
+        sendWebAppButton(chatID)
+    } else {
+        sendTelegramMessage(chatID, "Unknown command.")
+    }
 
     // Возвращаем HTTP статус 200 OK
     w.WriteHeader(http.StatusOK)
-
-    // Пример отправки ответа
-    sendTelegramMessage(update.Message.Chat.ID, "Thanks for your message!")
-}
-
-// Обработчик для API, который возвращает курсы
-func coursesHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(courses)
-}
-
-// Обработчик для статических файлов (HTML, CSS, JS)
-func serveStaticFiles(w http.ResponseWriter, r *http.Request) {
-    // Проверяем существование файлов в папке static
-    path := "./static" + r.URL.Path
-    if _, err := os.Stat(path); os.IsNotExist(err) {
-        http.NotFound(w, r)
-        return
-    }
-    http.ServeFile(w, r, path)
 }
 
 func main() {
-    // Проверка порта из переменной окружения
+    http.HandleFunc("/webhook", webhookHandler)
+    
+    fs := http.FileServer(http.Dir("./static"))
+    http.Handle("/", fs)
+
     port := os.Getenv("PORT")
     if port == "" {
         port = "8080"
     }
-
-    // Маршруты для Webhook, API курсов и статических файлов
-    http.HandleFunc("/webhook", webhookHandler)
-    http.HandleFunc("/api/courses", coursesHandler)
-    http.HandleFunc("/", serveStaticFiles)
-
-    // Запуск сервера
     log.Printf("Server is running on port %s...", port)
-    log.Fatal(http.ListenAndServe(":"+port, nil))
+    log.Fatal(http.ListenAndServe("0.0.0.0:"+port, nil))
 }

@@ -1,24 +1,37 @@
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f0f4f8;
+    background-color: #0A1A2F; /* Темно-синий фон */
+    color: #ffffff; /* Белый текст */
     margin: 0;
-    padding: 20px;
+    padding: 0;
 }
 
 .app-container {
     max-width: 600px;
     margin: 0 auto;
-    background-color: #fff;
+    background-color: #1C2B40; /* Темно-синий оттенок */
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     text-align: center;
+    opacity: 0;
+    transition: opacity 1s ease-in;
+}
+
+.show-container {
+    opacity: 1;
 }
 
 h1 {
-    color: #4CAF50;
     font-size: 26px;
     margin-bottom: 20px;
+    color: #ffffff;
+}
+
+h3 {
+    font-size: 22px;
+    color: #56D0F5; /* Голубой акцент */
+    margin-bottom: 15px;
 }
 
 .progress-container {
@@ -26,7 +39,7 @@ h1 {
 }
 
 .progress-bar {
-    background-color: #e0e0e0;
+    background-color: #2E4B63; /* Темный фон прогресса */
     border-radius: 10px;
     height: 20px;
     position: relative;
@@ -35,20 +48,14 @@ h1 {
 }
 
 .progress-bar-fill {
-    background-color: #4CAF50;
+    background-color: #56D0F5; /* Голубой прогресс */
     height: 100%;
     border-radius: 10px;
     transition: width 0.5s ease-in-out;
 }
 
-.badges {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-
 .badge {
-    background-color: #4CAF50;
+    background-color: #3A6EA5; /* Темно-синий значок */
     color: white;
     padding: 5px 10px;
     border-radius: 5px;
@@ -57,36 +64,22 @@ h1 {
 
 .course-item {
     padding: 15px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #2E4B63;
     text-align: left;
-    background-color: #f9f9f9;
+    background-color: #142538; /* Темно-синий блок */
     border-radius: 8px;
     margin-bottom: 10px;
     transition: transform 0.3s ease;
+    color: white;
 }
 
 .course-item:hover {
     transform: scale(1.02);
-    background-color: #e8f5e9;
-}
-
-.course-title {
-    font-weight: bold;
-    color: #333;
-    font-size: 18px;
-}
-
-.course-description {
-    color: #666;
-    margin-top: 5px;
-}
-
-#buttons {
-    margin: 20px 0;
+    background-color: #1F3B5A;
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: #56D0F5;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -98,45 +91,96 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #3AC1E7;
 }
 
-#loading {
-    text-align: center;
-    color: #4CAF50;
-    font-size: 18px;
-    margin: 20px 0;
+#ai-response {
+    color: #56D0F5; /* Голубой текст для ответов бота */
 }
 
-#user-info h2 {
-    color: #333;
-    font-size: 22px;
+input, select {
+    padding: 10px;
+    font-size: 16px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #2E4B63;
+    width: 100%;
+    background-color: #1C2B40;
+    color: #fff;
 }
 
-#user-info p {
-    color: #777;
+input::placeholder {
+    color: #5f7f9f;
+}
+
+/* Анимация загрузки с цитатой */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0A1A2F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.fade-in {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Стиль кошелька и модели Learn-2-Earn */
+.earn-container {
+    background-color: #142538; /* Темно-синий */
+    padding: 20px;
+    border-radius: 8px;
     margin-bottom: 20px;
 }
 
-label {
-    font-size: 16px;
-    color: #333;
+#wallet-status {
     margin-bottom: 10px;
-    display: block;
+    font-size: 18px;
+    color: #ffffff;
 }
 
-select {
-    padding: 10px;
-    font-size: 16px;
-    margin: 20px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 100%;
+#token-balance {
+    font-size: 18px;
+    color: #56D0F5; /* Голубой акцент */
+    margin-top: 10px;
 }
 
+#withdraw-tokens {
+    background-color: #3A6EA5; /* Темно-синий акцент */
+}
+
+/* Mobile styles */
 @media (max-width: 600px) {
     .app-container {
         padding: 20px;
+    }
+    
+    h1 {
+        font-size: 22px;
     }
     
     .course-title {

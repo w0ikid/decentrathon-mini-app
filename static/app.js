@@ -102,4 +102,26 @@ document.addEventListener("DOMContentLoaded", () => {
             Telegram.WebApp.close(); // Закрываем Web App
         });
     }
+    const aiResponse = document.getElementById('ai-response');
+    const aiInput = document.getElementById('ai-input');
+    const askAiButton = document.getElementById('ask-ai');
+
+    if (askAiButton) {
+        askAiButton.addEventListener('click', () => {
+            const userInput = aiInput.value.toLowerCase();
+
+            // Имитация ИИ-ответа
+            if (userInput.includes('course') || userInput.includes('lesson')) {
+                aiResponse.innerText = 'Sure! I recommend starting with the "Go Basics" course to improve your skills.';
+            } else if (userInput.includes('progress')) {
+                aiResponse.innerText = 'You have completed 50% of your current learning goals. Keep going!';
+            } else if (userInput === '') {
+                aiResponse.innerText = 'Please ask something!';
+            } else {
+                aiResponse.innerText = 'I am here to help with your learning journey! Ask me about your courses or progress.';
+            }
+
+            aiInput.value = ''; // Очищаем поле ввода
+        });
+    }
 });

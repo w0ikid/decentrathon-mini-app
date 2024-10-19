@@ -3,12 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram LMS Mini App</title>
+    <title>Telegram LMS Mini App - Learn-2-Earn</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0A1A2F; /* Темно-синий фон */
+            color: #ffffff; /* Белый текст */
+            margin: 0;
+            padding: 0;
+        }
+
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #1C2B40; /* Темно-синий оттенок */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        .show-container {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .earn-container, .progress-container, .ai-assistant-container, .top-users-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            background-color: #2E4B63; /* Темный фон прогресса */
+            border-radius: 10px;
+            height: 20px;
+            position: relative;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar-fill {
+            background-color: #56D0F5; /* Голубой прогресс */
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .badge {
+            background-color: #3A6EA5; /* Темно-синий значок */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .course-item {
+            padding: 15px;
+            border-bottom: 1px solid #2E4B63;
+            text-align: left;
+            background-color: #142538; /* Темно-синий блок */
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+            color: white;
+        }
+
+        .course-item:hover {
+            transform: scale(1.02);
+            background-color: #1F3B5A;
+        }
+
+        button {
+            background-color: #56D0F5;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3AC1E7;
+        }
+
+        #ai-response {
+            color: #56D0F5; /* Голубой текст для ответов бота */
+        }
+
+        input, select {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #2E4B63;
+            width: 100%;
+            background-color: #1C2B40;
+            color: #fff;
+        }
+
+        /* Топ пользователей */
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #142538;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+
+        .user-info {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+
+        .user-name {
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .user-tokens {
+            font-size: 14px;
+            color: #56D0F5;
+        }
+
+        .user-badges {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        /* Анимация загрузки с цитатой */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0A1A2F;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Mobile styles */
+        @media (max-width: 600px) {
+            .app-container {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="loading-screen" id="loading-screen">
+        "Education is the most powerful weapon which you can use to change the world." – Nelson Mandela
+    </div>
+
+    <div class="app-container" id="app-container">
         <h1>🏆 Welcome to the Telegram LMS</h1>
         <div id="user-info"></div> <!-- Блок для информации о пользователе -->
 
@@ -26,28 +217,241 @@
             </div>
         </div>
 
-        <!-- Блок фильтров -->
-        <label for="course-filter">Filter by category:</label>
-        <select id="course-filter">
-            <option value="all">All</option>
-            <option value="programming">Programming</option>
-            <option value="design">Design</option>
-            <option value="marketing">Marketing</option>
-        </select>
-
-        <!-- Блок кнопок -->
-        <div id="buttons">
-            <button id="send-message">Send a Message</button>
-            <button id="refresh-courses">Refresh Courses</button>
-            <button id="close-app">Close App</button>
+        <!-- Learn-2-Earn Модель -->
+        <div class="earn-container">
+            <h3>💰 Learn-2-Earn Model</h3>
+            <p>Earn tokens by completing courses and withdraw them to your wallet.</p>
+            <div id="wallet-status">Wallet not connected</div>
+            <button id="connect-wallet">Connect Wallet</button>
+            <div id="token-balance" style="display:none;">Token Balance: <span id="token-amount">0</span> L2E</div>
+            <button id="withdraw-tokens" style="display:none;">Withdraw Tokens</button>
         </div>
 
-        <!-- Спиннер загрузки -->
-        <div id="loading">Loading courses...</div>
-
         <!-- Список курсов -->
+        <h3>Available Courses</h3>
         <div id="courses"></div>
+
+        <!-- Топ пользователей -->
+        <h3>🏅 Top Learners</h3>
+        <div id="top-users"></div>
+
+        <!-- Блок тестирования -->
+        <div id="test-page" style="display:none;">
+            <h3>Course Quiz</h3>
+            <div id="question-container"></div>
+            <button id="submit-quiz" style="display:none;">Submit Quiz</button>
+        </div>
+
+        <!-- ИИ-помощник -->
+        <div class="ai-assistant-container">
+            <h3>🤖 AI Assistant</h3>
+            <p id="ai-response">Ask me anything about your courses!</p>
+            <input type="text" id="ai-input" placeholder="Type your question..." />
+            <button id="ask-ai">Ask AI</button>
+        </div>
     </div>
-    <script src="app.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const appContainer = document.getElementById('app-container');
+            const loadingScreen = document.getElementById('loading-screen');
+
+            // Имитация загрузки с анимацией
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                appContainer.classList.add('show-container');
+            }, 3000); // 3 секунды для отображения цитаты
+
+           // Топ пользователей (имитация)
+           const topUsers = [
+                { name: 'Test1', tokens: 120, badges: 3, avatar: 'gradient1' },
+                { name: 'Aboba', tokens: 100, badges: 2, avatar: 'gradient2' },
+                { name: 'Test3', tokens: 80, badges: 1, avatar: 'gradient3' },
+            ];
+
+            const topUsersContainer = document.getElementById('top-users');
+
+            // Функция для отображения топа пользователей
+            const displayTopUsers = () => {
+                topUsersContainer.innerHTML = '';
+                topUsers.forEach((user, index) => {
+                    const userElement = document.createElement('div');
+                    userElement.className = 'user-item';
+                    const avatarGradient = getAvatarGradient(user.avatar); // Получаем градиент
+                    userElement.innerHTML = `
+                        <div class="user-rank">${index + 1}</div>
+                        <div class="user-avatar" style="background-image: ${avatarGradient};">${user.name[0]}</div>
+                        <div class="user-info">
+                            <p class="user-name">${user.name}</p>
+                            <p class="user-tokens">💰 ${user.tokens} L2E</p>
+                            <div class="user-badges">
+                                ${'🎖️'.repeat(user.badges)}
+                            </div>
+                        </div>
+                    `;
+                    topUsersContainer.appendChild(userElement);
+                });
+            };
+
+            // Функция для генерации градиентов
+            const getAvatarGradient = (gradientType) => {
+                switch (gradientType) {
+                    case 'gradient1':
+                        return 'linear-gradient(to right, #ff7e5f, #feb47b)'; // Пример градиента 1
+                    case 'gradient2':
+                        return 'linear-gradient(to right, #43cea2, #185a9d)'; // Пример градиента 2
+                    case 'gradient3':
+                        return 'linear-gradient(to right, #4568dc, #b06ab3)'; // Пример градиента 3
+                    default:
+                        return 'linear-gradient(to right, #56D0F5, #3AC1E7)'; // Дефолтный градиент
+                }
+            };
+
+            // Инициализация отображения топа пользователей
+            displayTopUsers();
+
+            // Инициализация отображения топа пользователей
+            displayTopUsers();
+
+            // Статус кошелька и токены
+            let isWalletConnected = false;
+            let tokenBalance = 0;
+            const tokenPerCourse = 10;
+
+            const courses = [
+                { id: 1, title: 'Go Basics', description: 'Learn the basics of Go programming', correctAnswer: 2 },
+                { id: 2, title: 'JavaScript Essentials', description: 'Master the fundamentals of JavaScript', correctAnswer: 1 },
+                { id: 3, title: 'Python for Data Science', description: 'Use Python for data analysis', correctAnswer: 3 }
+            ];
+
+            const coursesContainer = document.getElementById('courses');
+            const questionContainer = document.getElementById('question-container');
+            const testPage = document.getElementById('test-page');
+            const submitQuizButton = document.getElementById('submit-quiz');
+            const walletStatus = document.getElementById('wallet-status');
+            const connectWalletButton = document.getElementById('connect-wallet');
+            const tokenBalanceElement = document.getElementById('token-balance');
+            const tokenAmountElement = document.getElementById('token-amount');
+            const withdrawTokensButton = document.getElementById('withdraw-tokens');
+
+            let selectedCourse = null;
+            let selectedAnswer = null;
+
+            // Функция для отображения списка курсов
+            const displayCourses = () => {
+                coursesContainer.innerHTML = '';
+                courses.forEach(course => {
+                    const courseElement = document.createElement('div');
+                    courseElement.className = 'course-item';
+                    courseElement.innerHTML = `
+                        <div class="course-title">${course.title}</div>
+                        <div class="course-description">${course.description}</div>
+                        <button class="start-course" data-id="${course.id}">Start Course</button>
+                    `;
+                    coursesContainer.appendChild(courseElement);
+                });
+            };
+
+            // Инициализация списка курсов
+            displayCourses();
+
+            // Привязка кошелька
+            connectWalletButton.addEventListener('click', () => {
+                if (!isWalletConnected) {
+                    isWalletConnected = true;
+                    walletStatus.innerText = 'Wallet successfully connected';
+                    connectWalletButton.style.display = 'none';
+                    tokenBalanceElement.style.display = 'block';
+                    withdrawTokensButton.style.display = 'block';
+                }
+            });
+
+            // Вывод токенов
+            withdrawTokensButton.addEventListener('click', () => {
+                if (tokenBalance > 0) {
+                    alert(`Successfully withdrawn ${tokenBalance} L2E tokens to your wallet!`);
+                    tokenBalance = 0;
+                    tokenAmountElement.innerText = tokenBalance;
+                } else {
+                    alert('No tokens to withdraw.');
+                }
+            });
+
+            // Обработчик для кнопки "Start Course"
+            coursesContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('start-course')) {
+                    const courseId = e.target.getAttribute('data-id');
+                    startQuiz(courseId);
+                }
+            });
+
+            // Функция для отображения теста
+            const startQuiz = (courseId) => {
+                selectedCourse = courses.find(course => course.id == courseId);
+                coursesContainer.style.display = 'none';
+                testPage.style.display = 'block';
+                submitQuizButton.style.display = 'block';
+
+                questionContainer.innerHTML = `
+                    <p><strong>Question:</strong> What is the main feature of the ${selectedCourse.title}?</p>
+                    <input type="radio" id="answer1" name="quiz" value="1"> Simplicity<br>
+                    <input type="radio" id="answer2" name="quiz" value="2"> Performance<br>
+                    <input type="radio" id="answer3" name="quiz" value="3"> Flexibility<br>
+                `;
+
+                questionContainer.addEventListener('change', (e) => {
+                    if (e.target.name === 'quiz') {
+                        selectedAnswer = e.target.value;
+                    }
+                });
+            };
+
+            // Обработчик для отправки теста
+            submitQuizButton.addEventListener('click', () => {
+                if (selectedAnswer) {
+                    if (parseInt(selectedAnswer) === selectedCourse.correctAnswer) {
+                        alert('Correct! You have passed the quiz.');
+                        if (isWalletConnected) {
+                            tokenBalance += tokenPerCourse;
+                            tokenAmountElement.innerText = tokenBalance;
+                            alert(`You earned ${tokenPerCourse} L2E tokens!`);
+                        }
+                    } else {
+                        alert('Incorrect. Try again.');
+                    }
+
+                    testPage.style.display = 'none';
+                    submitQuizButton.style.display = 'none';
+                    coursesContainer.style.display = 'block';
+                    selectedAnswer = null;
+                } else {
+                    alert('Please select an answer.');
+                }
+            });
+
+            // ИИ-помощник
+            const aiResponse = document.getElementById('ai-response');
+            const aiInput = document.getElementById('ai-input');
+            const askAiButton = document.getElementById('ask-ai');
+
+            askAiButton.addEventListener('click', () => {
+                const userInput = aiInput.value.toLowerCase();
+                aiResponse.innerText = '🤖 Bot is typing...';
+
+                setTimeout(() => {
+                    if (userInput.includes('course') || userInput.includes('lesson')) {
+                        aiResponse.innerText = 'Sure! I recommend starting with the "Go Basics" course to improve your skills.';
+                    } else if (userInput.includes('progress')) {
+                        aiResponse.innerText = 'You have completed 50% of your current learning goals. Keep going!';
+                    } else if (userInput === '') {
+                        aiResponse.innerText = 'Please ask something!';
+                    } else {
+                        aiResponse.innerText = 'I am here to help with your learning journey! Ask me about your courses or progress.';
+                    }
+                    aiInput.value = '';
+                }, 1500);
+            });
+        });
+    </script>
 </body>
 </html>
