@@ -9,14 +9,41 @@
 </head>
 <body>
     <div class="app-container">
-        <h1>Welcome to Telegram LMS</h1>
+        <h1>🏆 Welcome to the Telegram LMS</h1>
         <div id="user-info"></div> <!-- Блок для информации о пользователе -->
+
+        <!-- Прогресс-блок с геймификацией -->
+        <div class="progress-container">
+            <h3>Your Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" style="width: 50%"></div> <!-- Прогресс заполнен на 50% -->
+            </div>
+            <p>Level: 5</p>
+            <div class="badges">
+                <span class="badge">🎖️ Badge 1</span>
+                <span class="badge">🎖️ Badge 2</span>
+                <span class="badge">🎖️ Badge 3</span>
+            </div>
+        </div>
+
+        <!-- Блок фильтров -->
+        <label for="course-filter">Filter by category:</label>
+        <select id="course-filter">
+            <option value="all">All</option>
+            <option value="programming">Programming</option>
+            <option value="design">Design</option>
+            <option value="marketing">Marketing</option>
+        </select>
 
         <!-- Блок кнопок -->
         <div id="buttons">
             <button id="send-message">Send a Message</button>
+            <button id="refresh-courses">Refresh Courses</button>
             <button id="close-app">Close App</button>
         </div>
+
+        <!-- Спиннер загрузки -->
+        <div id="loading">Loading courses...</div>
 
         <!-- Список курсов -->
         <div id="courses"></div>
